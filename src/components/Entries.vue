@@ -2,11 +2,16 @@
     <div class="main-container">
         <!-- #Tasks Error : by default, Newest to oldest, so it needs to display the other sort option -->
         <button id="sort-button" @click="sortEntries()">Oldest to newest</button>
-        <div class="test" v-for="entry in sortedEntries" :key="entry.id">
-            <span>{{entry.title}},</span>
-        </div>
-        <div class="entries" v-for="entry in sortedEntries" :key="entry.id">
-            <!-- <h3>{{this.newestToOldest}}</h3> -->
+        
+        <!-- Initial sort -->
+        <input type="hidden" v-if="this.firstVisit" :value="this.initialSort()">
+        
+        <!-- FOR TEST PURPOSES -->
+        <!-- <h3>{{this.newestToOldest}}</h3> -->
+        <!-- <h3>{{this.initsort}}</h3> -->
+        
+        <div class="entries" v-for="entry in entries" :key="entry.id">
+            
             <h1>{{entry.title}}</h1>
             <p>{{entry.date | readableDate}}</p>
             <!-- FOR TEST PURPOSES -->
@@ -17,12 +22,6 @@
     </div>
 </template>
 
-
-// id: 2,
-//                         title: "My entry #2",
-//                         date: "2020-12-31 14:15:16",
-//                         image: "https://picsum.photos/id/1015/200/150",
-//                         text: 
 <script>
     export default {
         name: 'Entries',
@@ -31,7 +30,9 @@
         },
         data: function() {
             return {
-                newestToOldest : false
+                newestToOldest : true,
+                initsort : 0, // Debug purposes
+                firstVisit : true
             }
             
         },
@@ -40,10 +41,18 @@
                 get() {
                     let s = this.entries
                     return s.sort(this.compareDate).reverse()
-                }
-            }
+                },
+            },
+            
+            
         },
         methods: {
+            initialSort: function() {
+                this.firstVisit = false
+                this.initsort += 1
+                let s = this.sortedEntries
+                this.entries = s.sort(this.compareDate).reverse()
+            },
             compareDate: function(a,b) {
                 return a.date == b.date ? 0 : a.date > b.date ? 1 : - 1
             },
@@ -51,12 +60,12 @@
             sortEntries: function() {
                 var button = document.getElementById("sort-button")
                 this.newestToOldest = !this.newestToOldest
-
-                this.sortedEntries.reverse()
-                // alert(this.newestToOldest)
                 if (this.newestToOldest) {
+                    this.entries = this.sortedEntries
                     button.innerText = "Oldest to newest"
+                    
                 } else {
+                    this.entries = this.sortedEntries.reverse()
                     button.innerText = "Newest to Oldest"
                 }
             }
